@@ -5,10 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NoDataFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.dao.ItemDAOImpl;
+import ru.practicum.shareit.item.dao.ItemDAO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.item.mapping.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dao.UserDAO;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,13 +18,15 @@ import java.util.List;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemDAOImpl itemDAO;
+    private final ItemDAO itemDAO;
     private final ItemMapper itemMapper;
+    private final UserDAO userDAO;
 
     @Autowired
-    public ItemServiceImpl(ItemDAOImpl itemDAO, ItemMapper itemMapper) {
+    public ItemServiceImpl(ItemDAO itemDAO, ItemMapper itemMapper, UserDAO userDAO) {
         this.itemDAO = itemDAO;
         this.itemMapper = itemMapper;
+        this.userDAO = userDAO;
     }
 
     @Override
@@ -32,8 +35,8 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("При создании предмета не указан его владелец");
         }
 
-        //userDAO.get(ownerId)
-        //        .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + ownerId + " не найден"));
+        userDAO.get(ownerId)
+                .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + ownerId + " не найден"));
 
         Item item = itemMapper.itemDTOToItem(itemDTO);
         item.setOwnerId(ownerId);
@@ -45,6 +48,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO updateItem(Long itemId, ItemDTO itemDTO, Long ownerId) {
+
+        userDAO.get(ownerId)
+                .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + ownerId + " не найден"));
+
         Item item = itemMapper.itemDTOToItem(itemDTO);
 
         item.setId(itemId);
@@ -65,8 +72,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemDTO> getListItemByOwner(Long ownerId) {
-        //userDAO.get(ownerId)
-        //        .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + ownerId + " не найден"));
+        userDAO.get(ownerId)
+                .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + ownerId + " не найден"));
         return itemMapper.itemToItemDTOCollection(itemDAO.searchByOwner(ownerId));
     }
 

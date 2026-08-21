@@ -5,7 +5,11 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.NoDataFoundException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -51,7 +55,6 @@ public class ItemDAOImpl implements ItemDAO {
 
         log.info("Предмет с id = {} успешно обновлен.", item.getId());
         return updatedItem;
-
     }
 
     @Override
@@ -77,12 +80,15 @@ public class ItemDAOImpl implements ItemDAO {
             return List.of();
         }
 
+        String lowerSearchText = searchText.toLowerCase();
+
         return items.values().stream()
+                .filter(item -> item.getAvailable() != null && item.getAvailable())
                 .filter(item -> {
                     boolean isFindName = item.getName() != null
-                            && item.getName().contains(searchText);
+                            && item.getName().toLowerCase().contains(lowerSearchText);
                     boolean isFindDescription = item.getDescription() != null
-                            && item.getDescription().contains(searchText);
+                            && item.getDescription().toLowerCase().contains(lowerSearchText);
                     return isFindName || isFindDescription;
                 })
                 .collect(Collectors.toList());
