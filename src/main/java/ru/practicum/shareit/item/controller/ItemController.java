@@ -17,7 +17,7 @@ import java.util.Collection;
 @RequestMapping("/items")
 public class ItemController {
 
-    public static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
+    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @Autowired
