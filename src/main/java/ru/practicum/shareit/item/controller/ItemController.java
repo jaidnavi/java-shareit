@@ -4,20 +4,19 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.comment.dto.CommentsDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
+
 @Slf4j
 @RestController
 @RequestMapping("/items")
 public class ItemController {
 
-    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @Autowired
@@ -40,8 +39,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDTO getItem(@Valid @PathVariable Long itemId) {
-        return itemService.getItem(itemId);
+    public ItemDTO getItem(@Valid @PathVariable Long itemId,
+                           @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+        return itemService.getItem(itemId, ownerId);
     }
 
     @GetMapping
@@ -53,6 +53,13 @@ public class ItemController {
     public Collection<ItemDTO> searchItemBySearchText(
             @RequestParam String text) {
         return itemService.searchItemBySearchText(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentsDTO addCommentToItem(@PathVariable Long itemId,
+                                        @Valid @RequestBody CommentsDTO commentsDTO,
+                                        @RequestHeader(X_SHARER_USER_ID) Long authorId) {
+        return itemService.addCommentToItem(itemId, commentsDTO, authorId);
     }
 
 }

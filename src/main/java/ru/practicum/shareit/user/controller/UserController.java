@@ -9,9 +9,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @Slf4j
 @RequestMapping("/users")
@@ -29,8 +26,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDTO update(@Valid @PathVariable Long userId,
-                          @RequestBody UserDTO userDTO) {
+    public UserDTO update(@Valid @PathVariable Long userId, @RequestBody UserDTO userDTO) {
         return userService.updateUser(userId, userDTO);
     }
 

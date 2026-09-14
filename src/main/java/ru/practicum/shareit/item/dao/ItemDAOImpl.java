@@ -69,7 +69,7 @@ public class ItemDAOImpl implements ItemDAO {
         }
 
         return items.values().stream()
-                .filter(item -> ownerId.equals(item.getOwnerId()))
+                .filter(item -> ownerId.equals(item.getUser().getId()))
                 .collect(Collectors.toList());
     }
 
