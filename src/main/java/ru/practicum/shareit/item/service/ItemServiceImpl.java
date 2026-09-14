@@ -150,7 +150,7 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
 
-        return itemRepository.findByNameDescription(searchText, searchText).stream()
+        return itemRepository.findByNameDescription(searchText).stream()
                 .map(itemMapper::itemToItemDTO)
                 .toList();
     }
