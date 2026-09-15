@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static ru.practicum.shareit.booking.enumeration.StateEnum.*;
 
@@ -37,33 +38,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponseDTO addBooking(BookingRequestDTO bookingDTO, Long renterId) {
-        if (renterId == null) {
-            throw new ValidationException("Идентификатор пользователя должен быть заполнен!");
-        }
 
-        User user = userRepository.findById(renterId)
-                .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + renterId + " не найден"));
-
-        if (bookingDTO.getItemId() == null) {
-            throw new ValidationException("Идентификатор вещи должен быть заполнен!");
-        }
-
-        Item item = itemRepository.findById(bookingDTO.getItemId())
-                .orElseThrow(() -> new NoDataFoundException("Вещь с id " + bookingDTO.getItemId() + " не найдена"));
-
-        if (item.getUser() != null && item.getUser().getId().equals(renterId)) {
-            throw new NoDataFoundException("Нельзя бронировать собственную вещь");
-        }
-
-        if (Boolean.FALSE.equals(item.getAvailable())) {
-            throw new ValidationException("Вещь не доступна для бронирования!");
-        }
-
-        LocalDateTime start = bookingDTO.getStart();
-        LocalDateTime end = bookingDTO.getEnd();
-        if (start == null || end == null || !start.isBefore(end)) {
-            throw new ValidationException("Некорректные даты бронирования");
-        }
+        User user = chekUser(renterId);
+        Item item = chekItem(bookingDTO.getItemId(), renterId);
+        chekNewBooking(bookingDTO);
 
         Booking booking = bookingMapper.toBooking(bookingDTO, item, user);
         booking.setStatus(BookingStatus.WAITING.name());
@@ -73,27 +51,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponseDTO confirmOrReject(Long bookingId, Long itemOwnerId, Boolean approved) {
-        if (bookingId == null) {
-            throw new ValidationException("Идентификатор бронирования должен быть заполнен!");
-        }
-        if (itemOwnerId == null) {
-            throw new ValidationException("Идентификатор владельца должен быть заполнен!");
-        }
-        if (approved == null) {
-            throw new ValidationException("Параметр approved должен быть заполнен!");
-        }
 
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NoDataFoundException("Бронирование с id " + bookingId + " не найдено"));
-
-        if (!itemOwnerId.equals(booking.getItem().getUser().getId())) {
-            throw new ValidationException(
-                    "Подтверждение или отклонение запроса на бронирование может быть выполнено только владельцем вещи.");
-        }
-
-        if (!BookingStatus.WAITING.name().equals(booking.getStatus())) {
-            throw new ValidationException("Бронирование уже обработано");
-        }
+        chekParamIsNotNull(bookingId, itemOwnerId, approved);
+        Booking booking = checkBooking(bookingId);
+        checkOwnerForConfirmOrReject(itemOwnerId, booking.getItem().getUser().getId());
+        checkStatus(booking.getStatus());
 
         booking.setStatus(approved ? BookingStatus.APPROVED.name() : BookingStatus.REJECTED.name());
         return bookingMapper.toBookingDTO(bookingRepository.save(booking));
@@ -101,27 +63,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDTO getBookingById(Long bookingId, Long userId) {
-        if (bookingId == null) {
-            throw new ValidationException("Идентификатор бронирования должен быть заполнен!");
-        }
-        if (userId == null) {
-            throw new ValidationException("Идентификатор пользователя должен быть заполнен!");
-        }
 
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NoDataFoundException("Бронирование с id " + bookingId + " не найдено"));
+        chekUser(userId);
+        Booking booking = checkBooking(bookingId);
+        checkOwnerForGetBooking(userId, booking.getItem().getUser().getId(), booking.getUser().getId());
 
-        boolean isOwner = userId.equals(booking.getItem().getUser().getId());
-        boolean isRenter = userId.equals(booking.getUser().getId());
-        if (!isOwner && !isRenter) {
-            throw new NoDataFoundException(
-                    "Запрос может быть выполнен либо автором бронирования, либо владельцем вещи");
-        }
         return bookingMapper.toBookingDTO(booking);
     }
 
     @Override
     public List<BookingResponseDTO> getAllBookingByUserId(Long currentUserId, StateEnum state) {
+
         validateStateAndUser(currentUserId, state);
         LocalDateTime now = LocalDateTime.now();
 
@@ -144,6 +96,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDTO> getAllBookingByOwnerId(Long currentUserId, StateEnum state) {
+
         validateStateAndUser(currentUserId, state);
         LocalDateTime now = LocalDateTime.now();
 
@@ -174,4 +127,88 @@ public class BookingServiceImpl implements BookingService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + userId + " не найден"));
     }
+
+    private User chekUser(Long userId) {
+        if (userId == null) {
+            throw new ValidationException("Идентификатор пользователя должен быть заполнен!");
+        }
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoDataFoundException("Пользователь с id " + userId + " не найден"));
+    }
+
+
+    private Item chekItem(Long itemId, Long renterId) {
+        if (itemId == null) {
+            throw new ValidationException("Идентификатор вещи должен быть заполнен!");
+        }
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NoDataFoundException("Вещь с id " + itemId + " не найдена"));
+
+        if (item.getUser() != null && item.getUser().getId().equals(renterId)) {
+            throw new NoDataFoundException("Нельзя бронировать собственную вещь");
+        }
+
+        if (Boolean.FALSE.equals(item.getAvailable())) {
+            throw new ValidationException("Вещь не доступна для бронирования!");
+        }
+
+        return item;
+    }
+
+    private void chekNewBooking(BookingRequestDTO bookingDTO) {
+
+        LocalDateTime start = bookingDTO.getStart();
+        LocalDateTime end = bookingDTO.getEnd();
+
+        if (start == null || end == null || !start.isBefore(end)) {
+            throw new ValidationException("Некорректные даты бронирования");
+        }
+    }
+
+    private void chekParamIsNotNull(Long bookingId, Long itemOwnerId, Boolean approved) {
+        if (bookingId == null) {
+            throw new ValidationException("Идентификатор бронирования должен быть заполнен!");
+        }
+        if (itemOwnerId == null) {
+            throw new ValidationException("Идентификатор владельца должен быть заполнен!");
+        }
+        if (approved == null) {
+            throw new ValidationException("Параметр approved должен быть заполнен!");
+        }
+
+    }
+
+    private Booking checkBooking(Long bookingId) {
+        if (bookingId == null) {
+            throw new ValidationException("Идентификаторбронирования должен быть заполнен!");
+        }
+
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NoDataFoundException("Бронирование с id " + bookingId + " не найдено"));
+    }
+
+    private void checkOwnerForConfirmOrReject(Long itemOwnerId, Long userId) {
+        if (!Objects.equals(itemOwnerId, userId)) {
+            throw new ValidationException(
+                    "Подтверждение или отклонение запроса на бронирование может быть выполнено только владельцем вещи.");
+        }
+    }
+
+    private void checkStatus(String status) {
+        if (!BookingStatus.WAITING.name().equals(status)) {
+            throw new ValidationException("Бронирование уже обработано");
+        }
+    }
+
+    private void checkOwnerForGetBooking(Long userId, Long ownerId, Long rentarId) {
+        boolean isOwner = userId.equals(ownerId);
+        boolean isRenter = userId.equals(rentarId);
+        if (!isOwner && !isRenter) {
+            throw new NoDataFoundException(
+                    "Запрос может быть выполнен либо автором бронирования, либо владельцем вещи");
+        }
+    }
+
 }
