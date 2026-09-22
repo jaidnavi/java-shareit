@@ -182,7 +182,7 @@ public class BookingServiceImpl implements BookingService {
 
     private Booking checkBooking(Long bookingId) {
         if (bookingId == null) {
-            throw new ValidationException("Идентификаторбронирования должен быть заполнен!");
+            throw new ValidationException("Идентификатор бронирования должен быть заполнен!");
         }
 
         return bookingRepository.findById(bookingId)

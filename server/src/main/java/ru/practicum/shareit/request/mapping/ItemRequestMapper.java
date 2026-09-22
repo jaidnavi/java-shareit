@@ -12,10 +12,10 @@ import java.util.List;
 @Component
 public class ItemRequestMapper {
 
-    public static ItemRequest itemRequestDTOToItemRequest(ItemRequestDTO ItemRequestDTO) {
+    public static ItemRequest itemRequestDTOToItemRequest(ItemRequestDTO itemRequestDTO) {
         ItemRequest itemRequest = new ItemRequest();
-        if (ItemRequestDTO.getDescription() != null) {
-            itemRequest.setDescription(ItemRequestDTO.getDescription());
+        if (itemRequestDTO.getDescription() != null) {
+            itemRequest.setDescription(itemRequestDTO.getDescription());
         }
         return itemRequest;
     }

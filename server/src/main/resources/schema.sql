@@ -62,6 +62,6 @@ FROM bookings;
 DELETE
 FROM items;
 DELETE
-FROM users;
-DELETE
 FROM requests;
+DELETE
+FROM users;

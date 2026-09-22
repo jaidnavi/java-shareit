@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentsDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 
-import java.util.Collection;
-
 import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
 
 @RestController

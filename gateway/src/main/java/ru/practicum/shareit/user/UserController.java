@@ -9,8 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDTO;
 
-import java.util.Collection;
-
 
 @Controller
 @RequiredArgsConstructor

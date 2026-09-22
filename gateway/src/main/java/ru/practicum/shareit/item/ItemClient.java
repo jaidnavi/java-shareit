@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,12 +13,7 @@ import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.item.dto.CommentsDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
 
 @Service
 @Slf4j
@@ -62,7 +56,7 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> addCommentToItem(Long itemId, CommentsDTO commentsDTO, Long authorId) {
-        return post("/" + itemId + "/comment",authorId,commentsDTO);
+        return post("/" + itemId + "/comment", authorId, commentsDTO);
     }
 
 }

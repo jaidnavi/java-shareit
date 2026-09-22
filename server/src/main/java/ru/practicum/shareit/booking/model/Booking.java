@@ -41,15 +41,4 @@ public class Booking {
 
     private String status;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Booking)) return false;
-        return id != null && id.equals(((Booking) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

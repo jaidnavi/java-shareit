@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.ItemDTO;
@@ -14,6 +15,7 @@ import static ru.practicum.shareit.constants.Constants.JSON_DATE_TIME_PATTERN;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BookingResponseDTO {
     private Long id;
     private Long itemId;

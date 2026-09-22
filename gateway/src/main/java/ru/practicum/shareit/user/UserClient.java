@@ -11,7 +11,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.user.dto.UserDTO;
 
-import java.util.Collection;
 
 @Service
 @Slf4j

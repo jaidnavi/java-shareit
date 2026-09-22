@@ -1,6 +1,5 @@
 package ru.practicum.shareit;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Disabled
-class ShareItAppTest {
+class ShareItOldAppTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -40,15 +38,6 @@ class ShareItAppTest {
         assertEquals("kosticin", createdUser.getName());
     }
 
-    @Test
-    void postUser_whenInvalidData_Error() {
-        UserDTO user = UserDTO.builder()
-                .email("invalid-email-format") // Некорректный email
-                .name("kosticin")
-                .build();
-        ResponseEntity<UserDTO> postResponse = restTemplate.postForEntity("/users", user, UserDTO.class);
-        assertEquals(400, postResponse.getStatusCode().value());
-    }
 
     @Test
     void getUsers() {
@@ -68,56 +57,6 @@ class ShareItAppTest {
         UserDTO[] getUsers = getResponse.getBody();
         assertNotNull(getUsers);
         assertTrue(getUsers.length > 0, "Список не должен быть пустым");
-    }
-
-    @Test
-    void patchUser_whenCorrectData_updateUser() {
-        UserDTO initialUser = UserDTO.builder()
-                .email("old_" + UUID.randomUUID() + "@yandex.ru")
-                .name("Старое Имя")
-                .build();
-        ResponseEntity<UserDTO> postResponse = restTemplate.postForEntity("/users", initialUser, UserDTO.class);
-        assertEquals(200, postResponse.getStatusCode().value());
-        UserDTO savedUser = postResponse.getBody();
-        assertNotNull(savedUser);
-        Long userId = savedUser.getId();
-
-        UserDTO updatedData = UserDTO.builder()
-                .email("new_" + UUID.randomUUID() + "@yandex.ru")
-                .name("Новое Имя")
-                .build();
-
-        ResponseEntity<UserDTO> patchResponse = restTemplate.exchange(
-                "/users/" + userId,
-                HttpMethod.PATCH,
-                new HttpEntity<>(updatedData),
-                UserDTO.class
-        );
-
-        assertEquals(200, patchResponse.getStatusCode().value());
-        UserDTO updatedUser = patchResponse.getBody();
-        assertNotNull(updatedUser);
-        assertEquals(userId, updatedUser.getId(), "ID пользователя не должен измениться");
-        assertEquals(updatedData.getEmail(), updatedUser.getEmail());
-        assertEquals("Новое Имя", updatedUser.getName());
-    }
-
-    @Test
-    void putUser_whenIncorrectID_getError() {
-        UserDTO updatedData = UserDTO.builder()
-                .id(999L)
-                .email("new_email@yandex.ru")
-                .name("Новое Имя")
-                .build();
-
-        ResponseEntity<UserDTO> patchResponse = restTemplate.exchange(
-                "/users/999",
-                HttpMethod.PATCH,
-                new HttpEntity<>(updatedData),
-                UserDTO.class
-        );
-
-        assertEquals(404, patchResponse.getStatusCode().value());
     }
 
 

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.comment.dto.CommentsDTO;
@@ -14,6 +15,7 @@ import static ru.practicum.shareit.constants.Constants.JSON_DATE_TIME_PATTERN;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class ItemDTO {
 
     private Long id;

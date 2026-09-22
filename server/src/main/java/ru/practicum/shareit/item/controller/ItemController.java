@@ -25,22 +25,18 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDTO add(@Valid @RequestBody ItemDTO newItem,
-                       @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+    public ItemDTO add(@Valid @RequestBody ItemDTO newItem, @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
         return itemService.insertItem(newItem, ownerId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDTO update(@PathVariable Long itemId,
-                          @RequestBody ItemDTO itemDTO,
-                          @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+    public ItemDTO update(@PathVariable Long itemId, @RequestBody ItemDTO itemDTO, @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
         log.info("update");
         return itemService.updateItem(itemId, itemDTO, ownerId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDTO getItem(@Valid @PathVariable Long itemId,
-                           @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+    public ItemDTO getItem(@Valid @PathVariable Long itemId, @RequestHeader(X_SHARER_USER_ID) Long ownerId) {
         return itemService.getItem(itemId, ownerId);
     }
 
@@ -50,15 +46,12 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemDTO> searchItemBySearchText(
-            @RequestParam String text) {
+    public Collection<ItemDTO> searchItemBySearchText(@RequestParam String text) {
         return itemService.searchItemBySearchText(text);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentsDTO addCommentToItem(@PathVariable Long itemId,
-                                        @Valid @RequestBody CommentsDTO commentsDTO,
-                                        @RequestHeader(X_SHARER_USER_ID) Long authorId) {
+    public CommentsDTO addCommentToItem(@PathVariable Long itemId, @Valid @RequestBody CommentsDTO commentsDTO, @RequestHeader(X_SHARER_USER_ID) Long authorId) {
         return itemService.addCommentToItem(itemId, commentsDTO, authorId);
     }
 
