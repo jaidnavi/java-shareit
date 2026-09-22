@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NoDataFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dao.UserRepository;
@@ -28,9 +29,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO insertUser(UserDTO userDTO) {
-        User user = userMapper.userDTOToUser(userDTO);
-        User savedUser = userRepository.save(user);
-        return userMapper.userToUserDTO(savedUser);
+        try {
+            User user = userMapper.userDTOToUser(userDTO);
+            User savedUser = userRepository.save(user);
+            return userMapper.userToUserDTO(savedUser);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new ConflictException("Пользователь с таким email уже существует");
+        }
     }
 
     @Override

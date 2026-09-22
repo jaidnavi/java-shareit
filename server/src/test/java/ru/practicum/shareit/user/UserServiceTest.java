@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NoDataFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dao.UserRepository;
@@ -108,11 +109,18 @@ public class UserServiceTest {
 
     @Test
     void testInsertUserError_whenEmailIsDuplicate() {
-        service.insertUser(userMapper.userToUserDTO(testUser1));
+        UserService userService = new UserServiceImpl(userMapper, userRepositoryMock);
+
         User incorrectUser = new User();
         incorrectUser.setName("TEST");
         incorrectUser.setEmail("kosticin@test.ru");
-        assertThrows(DataIntegrityViolationException.class, () -> service.insertUser(userMapper.userToUserDTO(incorrectUser)));
+
+        Mockito.when(userRepositoryMock.save(Mockito.any(User.class)))
+                .thenThrow(new DataIntegrityViolationException("Duplicate email"));
+
+        assertThrows(ConflictException.class, () ->
+                userService.insertUser(userMapper.userToUserDTO(incorrectUser))
+        );
     }
 
     @Test
