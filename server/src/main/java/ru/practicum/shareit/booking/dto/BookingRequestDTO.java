@@ -17,10 +17,8 @@ import static ru.practicum.shareit.constants.Constants.JSON_DATE_TIME_PATTERN;
 @Builder
 public class BookingRequestDTO {
 
-
     @NotNull(message = "Идентификатор бронируемой вещи не может быть пустым")
     private Long itemId;
-
 
     @NotNull(message = "Дата и время начала бронирования не может быть пустой")
     @JsonFormat(pattern = JSON_DATE_TIME_PATTERN)
