@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
 
 @WebMvcTest(ItemRequestController.class)
 public class ItemRequestControllerTest {
@@ -55,7 +56,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(requestDTO);
 
         mvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(requestDTO))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -76,7 +77,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(List.of(requestDTO));
 
         mvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -94,7 +95,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(List.of(requestDTO));
 
         mvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -110,7 +111,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(requestDTO);
 
         mvc.perform(get("/requests/{requestId}", requestId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())

@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
 
 @WebMvcTest(BookingController.class)
 public class BookingControllerTest {
@@ -63,7 +64,7 @@ public class BookingControllerTest {
                 .thenReturn(responseDto);
 
         mvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(requestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -83,7 +84,7 @@ public class BookingControllerTest {
                 .thenReturn(responseDto);
 
         mvc.perform(patch("/bookings/{bookingId}", bookingId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .param("approved", "true")
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -100,7 +101,7 @@ public class BookingControllerTest {
                 .thenReturn(responseDto);
 
         mvc.perform(get("/bookings/{bookingId}", bookingId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -115,7 +116,7 @@ public class BookingControllerTest {
                 .thenReturn(List.of(responseDto));
 
         mvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .param("state", "WAITING") // Валидное состояние
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -127,7 +128,7 @@ public class BookingControllerTest {
     void testGetAllBookingByUserIdWithInvalidState() {
         org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> {
             mvc.perform(get("/bookings")
-                    .header("X-Sharer-User-Id", userId)
+                    .header(X_SHARER_USER_ID, userId)
                     .param("state", "INVALID_STATE_NAME")
                     .accept(MediaType.APPLICATION_JSON)
             );
@@ -140,7 +141,7 @@ public class BookingControllerTest {
                 .thenReturn(List.of(responseDto));
 
         mvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .param("state", "ALL")
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -155,7 +156,7 @@ public class BookingControllerTest {
         ServletException exception = Assertions.assertThrows(
                 jakarta.servlet.ServletException.class, () -> {
                     mvc.perform(get("/bookings/owner")
-                            .header("X-Sharer-User-Id", userId)
+                            .header(X_SHARER_USER_ID, userId)
                             .param("state", "UNSUPPORTED_STATUS")
                             .accept(MediaType.APPLICATION_JSON)
                     );

@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.constants.Constants.X_SHARER_USER_ID;
 
 @WebMvcTest(ItemController.class)
 public class ItemControllerTest {
@@ -57,7 +58,7 @@ public class ItemControllerTest {
                 .thenReturn(itemDTO);
 
         mvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId) // Передаем заголовок владельца
+                        .header(X_SHARER_USER_ID, userId) // Передаем заголовок владельца
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(itemDTO))
@@ -76,7 +77,7 @@ public class ItemControllerTest {
                 .thenReturn(itemDTO);
 
         mvc.perform(get("/items/{itemId}", 12345L)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(12345))
@@ -90,7 +91,7 @@ public class ItemControllerTest {
                 .thenReturn(itemDTO);
 
         mvc.perform(patch("/items/{itemId}", 12345L)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(itemDTO))
@@ -122,7 +123,7 @@ public class ItemControllerTest {
                 .thenReturn(List.of(itemDTO));
 
         mvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -146,7 +147,7 @@ public class ItemControllerTest {
                 .thenReturn(commentDto);
 
         mvc.perform(post("/items/{itemId}/comment", itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(commentDto)) // Сериализуем в JSON
                         .characterEncoding(StandardCharsets.UTF_8)
